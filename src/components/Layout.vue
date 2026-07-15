@@ -5,6 +5,17 @@ const router = useRouter()
 const resetQuiz = () => {
   router.push('/')
 }
+
+const goToCommunity = () => {
+  const storedContentId = typeof window !== 'undefined' ? window.sessionStorage.getItem('selectedFestivalContentId') : null
+
+  if (!storedContentId) {
+    router.replace('/')
+    return
+  }
+
+  router.push('/result')
+}
 </script>
 
 <template>
@@ -22,10 +33,14 @@ const resetQuiz = () => {
           
           <!-- Navigation Links (hidden on mobile) -->
           <div class="hidden md:flex space-x-8">
-            <a href="#" class="text-gray-600 hover:text-gray-900 font-medium text-sm transition">
+            <a href="/" class="text-gray-600 hover:text-gray-900 font-medium text-sm transition">
               Vibe 테스트
             </a>
-            <a href="#" class="text-gray-600 hover:text-gray-900 font-medium text-sm transition">
+            <a
+              href="/result"
+              class="text-gray-600 hover:text-gray-900 font-medium text-sm transition"
+              @click.prevent="goToCommunity"
+            >
               축제 커뮤니티
             </a>
           </div>
