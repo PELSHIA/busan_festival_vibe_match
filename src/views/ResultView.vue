@@ -4,6 +4,13 @@ import ResultHeader from '../components/ResultHeader.vue'
 import ResultMap from '../components/ResultMap.vue'
 import ResultCalendar from '../components/ResultCalendar.vue'
 import ResultReviews from '../components/ResultReviews.vue'
+import ChatWidget from '../components/ChatWidget.vue'
+
+// TODO: 실제 설문 결과에 따라 festival 데이터를 동적으로 가져오도록 수정 필요
+const festival = {
+  name: '부산 해수욕 축제', // 실제 설문 결과로 교체하세요
+  description: '해변에서 열리는 음악·먹거리 중심의 축제입니다.'
+}
 
 const router = useRouter()
 
@@ -15,6 +22,7 @@ const resetQuiz = () => {
 <template>
   <div class="p-4 sm:p-6 lg:p-8 max-w-6xl mx-auto w-full">
     <!-- Back Button -->
+    <ChatWidget :festival="festival" />
     <button
       @click="resetQuiz"
       class="mb-6 inline-flex items-center text-gray-600 hover:text-gray-900 transition font-medium text-sm"
