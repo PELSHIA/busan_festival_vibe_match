@@ -1,7 +1,11 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { computed, ref } from 'vue'
 
-const currentMonth = ref(new Date(2026, 8)) // September 2026
+const props = defineProps({
+  festival: Object
+})
+
+const currentMonth = ref(new Date(2026, 8))
 
 const getDaysInMonth = (date) => {
   return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate()
@@ -16,12 +20,10 @@ const calendarDays = computed(() => {
   const firstDay = getFirstDayOfMonth(currentMonth.value)
   const days = []
 
-  // 빈 칸
   for (let i = 0; i < firstDay; i++) {
     days.push(null)
   }
 
-  // 날짜
   for (let i = 1; i <= daysInMonth; i++) {
     days.push(i)
   }
@@ -29,9 +31,23 @@ const calendarDays = computed(() => {
   return days
 })
 
-const eventDates = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+const eventDates = computed(() => {
+  if (!props.festival?.startDate || !props.festival?.endDate) return []
 
-const isEventDate = (day) => day && eventDates.includes(day)
+  const start = new Date(`${props.festival.startDate}T00:00:00`)
+  const end = new Date(`${props.festival.endDate}T00:00:00`)
+  const dates = []
+
+  const current = new Date(start)
+  while (current <= end) {
+    dates.push(current.getDate())
+    current.setDate(current.getDate() + 1)
+  }
+
+  return dates
+})
+
+const isEventDate = (day) => day && eventDates.value.includes(day)
 </script>
 
 <template>
@@ -83,10 +99,9 @@ const isEventDate = (day) => day && eventDates.includes(day)
         </div>
       </div>
 
-      <!-- Event Info -->
       <div class="pt-4 border-t border-gray-200">
         <p class="text-xs text-gray-500 font-bold mb-2">행사 기간</p>
-        <p class="font-bold text-gray-900">2026년 9월 1-15일 (15일간)</p>
+        <p class="font-bold text-gray-900">{{ festival?.startDate?.replace(/-/g, '.') }} ~ {{ festival?.endDate?.replace(/-/g, '.') }}</p>
       </div>
     </div>
   </div>

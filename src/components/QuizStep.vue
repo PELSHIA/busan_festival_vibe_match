@@ -1,30 +1,36 @@
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed, ref } from 'vue'
+import { pickQuestions } from '../utils/festivalRecommender.mjs'
 
-defineProps({
+const props = defineProps({
   currentStep: Number
 })
 
-const emit = defineEmits(['next', 'prev'])
-const router = useRouter()
+const emit = defineEmits(['next', 'prev', 'answer'])
 
-const selectedQ1 = ref(null)
-const selectedQ2 = ref(null)
+const questions = ref([])
+const selectedAnswers = ref([])
 
-const selectAnswer = (qNum, value) => {
-  if (qNum === 1) {
-    selectedQ1.value = value
-    setTimeout(() => {
-      emit('next')
-    }, 300)
-  }
-  if (qNum === 2) {
-    selectedQ2.value = value
-    setTimeout(() => {
-      emit('next')
-    }, 300)
-  }
+const currentQuestion = computed(() => questions.value[props.currentStep - 1] || null)
+
+const initializeQuestions = () => {
+  questions.value = pickQuestions(3)
+}
+
+if (questions.value.length === 0) {
+  initializeQuestions()
+}
+
+const selectAnswer = (value) => {
+  const question = currentQuestion.value
+  if (!question) return
+
+  selectedAnswers.value.push(value)
+  emit('answer', { questionId: question.id, value })
+
+  setTimeout(() => {
+    emit('next')
+  }, 250)
 }
 
 const handleNext = () => {
@@ -47,7 +53,7 @@ const handlePrev = () => {
         <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-500 to-purple-500">부산 바이브</span>찾기
       </h1>
       <p class="text-gray-500 text-lg mb-8 max-w-md">
-        단 2개의 질문으로 오늘 당신에게<br>딱 맞는 부산 축제를 추천해 드립니다.
+        3개의 질문으로 오늘 당신에게<br>딱 맞는 부산 축제를 추천해 드립니다.
       </p>
       <button
         @click="handleNext"
@@ -57,80 +63,36 @@ const handlePrev = () => {
       </button>
     </div>
 
-    <!-- Question 1 -->
-    <div v-if="currentStep === 1" class="absolute inset-0 flex flex-col justify-center fade-in">
+    <!-- Questions -->
+    <div v-if="currentStep > 0 && currentStep < 4" class="absolute inset-0 flex flex-col justify-center fade-in">
+      <div v-if="currentStep > 1" class="mb-6">
+        <button @click="handlePrev" class="text-gray-600 hover:text-gray-900 transition flex items-center text-sm">
+          <i class="fas fa-arrow-left mr-2"></i>이전
+        </button>
+      </div>
+
       <div class="mb-8">
-        <span class="text-xs font-bold text-blue-500 tracking-wider">QUESTION 01</span>
+        <span class="text-xs font-bold text-blue-500 tracking-wider">QUESTION {{ currentStep }}</span>
         <h2 class="text-2xl font-bold text-gray-900 mt-3">
-          오늘 나의 에너지 상태는 어떤가요?
+          {{ currentQuestion?.question }}
         </h2>
       </div>
 
-      <div class="grid grid-cols-2 gap-4 mb-8">
-        <!-- Option 1 -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
         <div
-          @click="selectAnswer(1, 'energetic')"
+          v-for="(option, index) in currentQuestion?.options || []"
+          :key="`${currentQuestion?.id}-${index}`"
+          @click="selectAnswer(option.value)"
           class="quiz-option p-6 border-2 border-gray-250 rounded-xl cursor-pointer bg-white hover:bg-gray-50 flex flex-col items-center text-center transition-all"
-          :class="{ 'selected bg-blue-50 border-blue-500': selectedQ1 === 'energetic' }"
         >
-          <div class="text-5xl mb-3">🔥</div>
-          <p class="text-gray-900 font-bold text-sm">에너지 폭발!</p>
-          <p class="text-gray-500 text-xs mt-2">집에 있으면 병남.<br>무조건 밖에서 뛰어놀아야 해!</p>
-        </div>
-
-        <!-- Option 2 -->
-        <div
-          @click="selectAnswer(1, 'emotional')"
-          class="quiz-option p-6 border-2 border-gray-250 rounded-xl cursor-pointer bg-white hover:bg-gray-50 flex flex-col items-center text-center transition-all"
-          :class="{ 'selected bg-blue-50 border-blue-500': selectedQ1 === 'emotional' }"
-        >
-          <div class="text-5xl mb-3">🎧</div>
-          <p class="text-gray-900 font-bold text-sm">감성 충전 필요</p>
-          <p class="text-gray-500 text-xs mt-2">복잡한 건 싫어.<br>여유롭게 분위기를 즐길래.</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Question 2 -->
-    <div v-if="currentStep === 2" class="absolute inset-0 flex flex-col justify-center fade-in">
-      <button @click="handlePrev" class="mb-6 text-gray-600 hover:text-gray-900 transition flex items-center text-sm">
-        <i class="fas fa-arrow-left mr-2"></i>이전
-      </button>
-
-      <div class="mb-8">
-        <span class="text-xs font-bold text-blue-500 tracking-wider">QUESTION 02</span>
-        <h2 class="text-2xl font-bold text-gray-900 mt-3">
-          이번 주말, 끌리는 테마는?
-        </h2>
-      </div>
-
-      <div class="grid grid-cols-2 gap-4 mb-8">
-        <!-- Option 1 -->
-        <div
-          @click="selectAnswer(2, 'trendy')"
-          class="quiz-option p-6 border-2 border-gray-250 rounded-xl cursor-pointer bg-white hover:bg-gray-50 flex flex-col items-center text-center transition-all"
-          :class="{ 'selected bg-blue-50 border-blue-500': selectedQ2 === 'trendy' }"
-        >
-          <div class="text-5xl mb-3">✨</div>
-          <p class="text-gray-900 font-bold text-sm">트렌디 & 화려함</p>
-          <p class="text-gray-500 text-xs mt-2">인생샷 필수!<br>화려한 볼거리와 음악이 있는 곳.</p>
-        </div>
-
-        <!-- Option 2 -->
-        <div
-          @click="selectAnswer(2, 'local')"
-          class="quiz-option p-6 border-2 border-gray-250 rounded-xl cursor-pointer bg-white hover:bg-gray-50 flex flex-col items-center text-center transition-all"
-          :class="{ 'selected bg-blue-50 border-blue-500': selectedQ2 === 'local' }"
-        >
-          <div class="text-5xl mb-3">👥</div>
-          <p class="text-gray-900 font-bold text-sm">로컬 & 사람냄새</p>
-          <p class="text-gray-500 text-xs mt-2">맛있는 먹거리와 북적이는<br>전통/시장의 매력.</p>
+          <div class="text-5xl mb-3">{{ option.value === 'PASSION' ? '🔥' : option.value === 'HEALING' ? '🍃' : option.value === 'ROMANTIC' ? '🌙' : '🍻' }}</div>
+          <p class="text-gray-900 font-bold text-sm">{{ option.label }}</p>
         </div>
       </div>
     </div>
 
     <!-- Loading Step -->
-    <div v-if="currentStep === 3" class="absolute inset-0 flex flex-col items-center justify-center text-center fade-in">
+    <div v-if="currentStep === 4" class="absolute inset-0 flex flex-col items-center justify-center text-center fade-in">
       <div class="mb-8">
         <div class="relative w-16 h-16 mx-auto">
           <svg class="w-16 h-16 animate-spin" viewBox="0 0 24 24" fill="none">
