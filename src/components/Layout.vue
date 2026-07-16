@@ -27,8 +27,8 @@ const goToCommunity = () => {
           <!-- Logo -->
           <div class="flex items-center cursor-pointer group" @click="resetQuiz">
             <i class="fas fa-compass text-blue-500 mr-2 text-xl"></i>
-            <span class="text-lg font-bold text-gray-900">LocalHub</span>
-            <span class="text-lg font-bold text-blue-500 ml-1">Busan</span>
+            <span class="text-lg font-bold text-gray-900">Busan</span>
+            <span class="text-lg font-bold text-blue-500 ml-1">Vibe Match</span>
           </div>
           
           <!-- Navigation Links (hidden on mobile) -->
