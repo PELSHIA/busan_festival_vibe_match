@@ -1,5 +1,9 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
+
+const props = defineProps({
+  festival: Object
+})
 
 const STORAGE_KEY = 'festival-reviews'
 const reviews = ref([])
@@ -39,12 +43,16 @@ const editErrors = ref({
 })
 
 const loadReviews = () => {
+  if (!props.festival?.contentid) return
+  
   const saved = localStorage.getItem(STORAGE_KEY)
   if (!saved) return
 
   try {
     const parsed = JSON.parse(saved)
-    reviews.value = Array.isArray(parsed) ? parsed : []
+    const allReviews = Array.isArray(parsed) ? parsed : []
+    // festival.contentid와 일치하는 festivalId만 필터링
+    reviews.value = allReviews.filter(review => review.festivalId === props.festival.contentid)
   } catch (error) {
     console.error('리뷰 저장소를 불러오지 못했습니다.', error)
     reviews.value = []
@@ -52,7 +60,19 @@ const loadReviews = () => {
 }
 
 const saveReviews = () => {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(reviews.value))
+  if (!props.festival?.contentid) return
+  
+  // 1. 기존 로컬스토리지의 모든 리뷰 로드
+  const saved = localStorage.getItem(STORAGE_KEY)
+  const allReviews = saved ? JSON.parse(saved) : []
+  
+  // 2. 현재 축제가 아닌 리뷰들만 필터링 (다른 축제 리뷰 보존)
+  const otherFestivals = allReviews.filter(review => review.festivalId !== props.festival.contentid)
+  
+  // 3. 현재 축제 리뷰 + 다른 축제 리뷰 합쳐서 저장
+  const updated = [...reviews.value, ...otherFestivals]
+  
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(updated))
 }
 
 const resetForm = () => {
@@ -135,6 +155,7 @@ const submitReview = () => {
 
   const review = {
     id: Date.now(),
+    festivalId: props.festival.contentid,
     title: formData.value.title.trim(),
     author: formData.value.author.trim(),
     content: formData.value.content.trim(),
@@ -287,8 +308,19 @@ const deleteReview = () => {
   closeActionModal()
   closeDetailModal()
 }
+
+watch(() => props.festival?.contentid, (contentId) => {
+  // contentId가 실제로 값이 있을 때만 로드
+  if (contentId) {
+    loadReviews()
+  }
+})
+
 onMounted(() => {
-  loadReviews()
+  // festival 데이터가 없으면 다시 확인
+  if (props.festival?.contentid) {
+    loadReviews()
+  }
 })
 </script>
 
