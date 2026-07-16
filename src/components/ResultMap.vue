@@ -34,7 +34,7 @@ const openKakaoMap = () => {
 
 const getApiKey = () => {
   const envKey = (import.meta.env.VITE_KAKAO_MAP_API_KEY || import.meta.env.KAKAO_MAP_API_KEY || '').trim()
-  return envKey || 'f1c7025ea1dbdf67bbb3fa3c5ba07ba0'
+  return envKey
 }
 
 const loadKakaoMap = () => {
