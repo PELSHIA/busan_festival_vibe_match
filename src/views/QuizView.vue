@@ -1,13 +1,25 @@
 <script setup>
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import QuizStep from '../components/QuizStep.vue'
+import festivalData from '../../public/data/부산_축제공연행사.json'
+import { recommendFestival, resolveVibe } from '../utils/festivalRecommender.mjs'
 
 const router = useRouter()
 const currentStep = ref(0)
+const selectedVibes = ref([])
+const STORAGE_KEY = 'selectedFestivalContentId'
+
+const resetQuizState = () => {
+  currentStep.value = 0
+  selectedVibes.value = []
+  sessionStorage.removeItem('quizResult')
+}
+
+resetQuizState()
 
 const nextStep = () => {
-  if (currentStep.value < 3) {
+  if (currentStep.value < 4) {
     currentStep.value++
   }
 }
@@ -18,8 +30,37 @@ const prevStep = () => {
   }
 }
 
+const handleAnswer = ({ value }) => {
+  selectedVibes.value.push(value)
+}
+
+const progressPercent = computed(() => {
+  if (currentStep.value === 0) return 0
+  if (currentStep.value === 1) return 25
+  if (currentStep.value === 2) return 50
+  if (currentStep.value === 3) return 75
+  return 100
+})
+
+const saveRecommendedFestival = (votes) => {
+  const vibe = resolveVibe(votes)
+  const festival = recommendFestival(festivalData.items, votes)
+
+  if (festival?.contentid) {
+    window.sessionStorage.setItem(STORAGE_KEY, String(festival.contentid))
+  } else {
+    window.sessionStorage.removeItem(STORAGE_KEY)
+  }
+
+  return { vibe, festival }
+}
+
 watch(currentStep, (newStep) => {
-  if (newStep === 3) {
+  if (newStep === 4) {
+    const payload = JSON.stringify(selectedVibes.value)
+    sessionStorage.setItem('quizResult', payload)
+    saveRecommendedFestival(selectedVibes.value)
+
     setTimeout(() => {
       router.push('/result')
     }, 1500)
@@ -38,7 +79,7 @@ watch(currentStep, (newStep) => {
       <div class="h-2 bg-gray-100 w-full relative">
         <div 
           class="absolute top-0 left-0 h-full bg-gradient-to-r from-brand-500 to-purple-500 transition-all duration-500"
-          :style="{ width: currentStep === 0 ? '0%' : currentStep === 1 ? '33%' : currentStep === 2 ? '66%' : '100%' }"
+          :style="{ width: `${progressPercent}%` }"
         ></div>
       </div>
 
@@ -48,6 +89,7 @@ watch(currentStep, (newStep) => {
           :current-step="currentStep"
           @next="nextStep"
           @prev="prevStep"
+          @answer="handleAnswer"
         />
       </div>
     </div>
