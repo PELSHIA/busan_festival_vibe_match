@@ -7,6 +7,7 @@ import ResultCalendar from '../components/ResultCalendar.vue'
 import ResultReviews from '../components/ResultReviews.vue'
 import festivalData from '../../public/data/부산_축제공연행사.json'
 import { findFestivalByContentId } from '../utils/festivalRecommender.mjs'
+import ChatWidget from '../components/ChatWidget.vue'
 
 const router = useRouter()
 const selectedFestival = ref(null)
@@ -49,6 +50,7 @@ const resultTitle = computed(() => selectedFestival.value?.title || '오늘의 �
 <template>
   <div class="p-4 sm:p-6 lg:p-8 max-w-6xl mx-auto w-full">
     <!-- Back Button -->
+    <ChatWidget :festival="selectedFestival" />
     <button
       @click="resetQuiz"
       class="mb-6 inline-flex items-center text-gray-600 hover:text-gray-900 transition font-medium text-sm"
@@ -67,7 +69,7 @@ const resultTitle = computed(() => selectedFestival.value?.title || '오늘의 �
     </section>
 
     <!-- 3. Community Reviews -->
-    <ResultReviews />
+    <ResultReviews :festival="selectedFestival" />
   </div>
 </template>
 
