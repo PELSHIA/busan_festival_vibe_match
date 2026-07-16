@@ -2,7 +2,8 @@
 import { onMounted, ref, watch } from 'vue'
 
 const props = defineProps({
-  festival: Object
+  festival: Object,
+  writeTrigger: Number
 })
 
 const STORAGE_KEY = 'festival-reviews'
@@ -314,6 +315,10 @@ watch(() => props.festival?.contentid, (contentId) => {
   if (contentId) {
     loadReviews()
   }
+})
+
+watch(() => props.writeTrigger, () => {
+  openWriteModal()
 })
 
 onMounted(() => {

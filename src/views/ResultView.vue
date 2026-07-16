@@ -12,6 +12,7 @@ import ChatWidget from '../components/ChatWidget.vue'
 const router = useRouter()
 const selectedFestival = ref(null)
 const selectedVibe = ref('')
+const reviewWriteTrigger = ref(0)
 const STORAGE_KEY = 'selectedFestivalContentId'
 
 const loadResult = () => {
@@ -45,6 +46,10 @@ const resetQuiz = () => {
 }
 
 const resultTitle = computed(() => selectedFestival.value?.title || '오늘의 부산 축제')
+
+const openReviewWrite = () => {
+  reviewWriteTrigger.value += 1
+}
 </script>
 
 <template>
@@ -60,7 +65,7 @@ const resultTitle = computed(() => selectedFestival.value?.title || '오늘의 �
     </button>
 
     <!-- 1. Festival Header -->
-    <ResultHeader :festival="selectedFestival" :vibe="selectedVibe" />
+    <ResultHeader :festival="selectedFestival" :vibe="selectedVibe" @open-review-write="openReviewWrite" />
 
     <!-- 2. Map & Calendar Side-by-Side -->
     <section class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12 slide-up" style="animation-delay: 0.2s;">
@@ -69,7 +74,7 @@ const resultTitle = computed(() => selectedFestival.value?.title || '오늘의 �
     </section>
 
     <!-- 3. Community Reviews -->
-    <ResultReviews :festival="selectedFestival" />
+    <ResultReviews :festival="selectedFestival" :write-trigger="reviewWriteTrigger" />
   </div>
 </template>
 
