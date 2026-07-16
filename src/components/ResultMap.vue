@@ -137,7 +137,10 @@ watch(
   <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden flex flex-col h-[400px]">
     <div class="p-6 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
       <h3 class="font-bold text-lg text-gray-900">📍 위치</h3>
-      <button class="w-8 h-8 text-gray-400 hover:text-gray-600 transition">
+      <button
+        class="w-8 h-8 text-gray-400 hover:text-gray-600 transition"
+        @click="openKakaoMap"
+      >
         <i class="fas fa-external-link-alt"></i>
       </button>
     </div>
