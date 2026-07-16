@@ -406,7 +406,7 @@ onMounted(() => {
           <input
             v-model="formData.title"
             type="text"
-            placeholder="멍댱 자리, 꿀팁 등"
+            placeholder="명당 자리, 꿀팁 등"
             class="w-full px-4 py-3 border rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition text-sm"
             :class="errors.title ? 'border-red-500' : 'border-gray-300'"
           />
@@ -432,7 +432,7 @@ onMounted(() => {
           </div>
           <textarea
             v-model="formData.content"
-            placeholder="생생한 후기를 확인해주세요!"
+            placeholder="생생한 후기를 작성해주세요"
             rows="5"
             class="w-full px-4 py-3 border rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition text-sm resize-none"
             :class="errors.content ? 'border-red-500' : 'border-gray-300'"

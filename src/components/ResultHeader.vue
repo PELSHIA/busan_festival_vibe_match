@@ -46,7 +46,7 @@ const handleShare = async () => {
   }
 
   showShareModal.value = true
-  shareMessage.value = '아래 링크를 복사해서 SNS에 공유해보세요.'
+  shareMessage.value = '링크를 복사해서 SNS에 공유해보세요.'
 }
 
 const copyShareLink = async () => {
