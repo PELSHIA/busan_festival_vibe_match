@@ -1,6 +1,6 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import ResultHeader from '../components/ResultHeader.vue'
 import ResultMap from '../components/ResultMap.vue'
 import ResultCalendar from '../components/ResultCalendar.vue'
@@ -10,17 +10,24 @@ import { findFestivalByContentId } from '../utils/festivalRecommender.mjs'
 import ChatWidget from '../components/ChatWidget.vue'
 
 const router = useRouter()
+const route = useRoute()
 const selectedFestival = ref(null)
 const selectedVibe = ref('')
 const reviewWriteTrigger = ref(0)
 const STORAGE_KEY = 'selectedFestivalContentId'
 
 const loadResult = () => {
-  const storedContentId = window.sessionStorage.getItem(STORAGE_KEY)
+  const festivalParam = route?.query?.festival || new URL(window.location.href).searchParams.get('festival')
+  const storedContentId = festivalParam || window.sessionStorage.getItem(STORAGE_KEY)
 
   if (!storedContentId) {
     router.replace('/')
     return
+  }
+
+  // 쿼리로 들어온 경우 세션에 저장해서 후속 동작이 동일하게 동작하도록 함
+  if (festivalParam) {
+    window.sessionStorage.setItem(STORAGE_KEY, festivalParam)
   }
 
   const festival = findFestivalByContentId(festivalData.items, storedContentId)
